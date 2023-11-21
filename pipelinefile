@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+
+    environment {
+        MAVEN_HOME = tool 'maven1'
+        PATH = "$MAVEN_HOME/bin:$PATH"
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('secretfileid') 
+        GCS_BUCKET = 'jenkins-artifacts1'
+        GCE_INSTANCE_NAME = 'instance-jen'
+        GCE_ZONE = 'us-central1-a'
+        PROJECT_ID = 'advance-mantis-405222' 
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                // Build your application 
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Run tests 
+                sh 'mvn test'
+            }
+        }
+
+        stage('Deploy to GCS') {
+            steps {
+                // Deploy artifacts to Google Cloud Storage
+                sh "gsutil cp -r target/* gs://${GCS_BUCKET}/"
+            }
+        }
+
+        stage('Deploy to GCE') {
+            steps {
+                // Deploy to Google Compute Engine using gcloud commands
+                script {
+                    withCredentials([file(credentialsId: 'secretfileid', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+                    }
+
+                    // Deploy to GCE using gcloud commands
+                    sh "gcloud compute instances create ${GCE_INSTANCE_NAME} --project=${PROJECT_ID} --image=c0-deeplearning-common-cpu-v20230925-debian-10 --zone=us-central1-a"
+                }
+            }
+        }
+    }
+}
