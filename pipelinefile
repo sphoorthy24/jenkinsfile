@@ -4,7 +4,7 @@ pipeline {
     environment {
         MAVEN_HOME = tool 'maven1'
         PATH = "$MAVEN_HOME/bin:$PATH"
-        GOOGLE_APPLICATION_CREDENTIALS = credentials('secretfileid') 
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('5d2d22b9-70c7-46e9-8f4c-1e31d6bffe49') 
         GCS_BUCKET = 'jenkins-artifacts1'
         GCE_INSTANCE_NAME = 'instance-jen'
         GCE_ZONE = 'us-central1-a'
@@ -43,7 +43,7 @@ stages {
             steps {
                 // Deploy to Google Compute Engine using gcloud commands
                 script {
-                    withCredentials([file(credentialsId: 'secretfileid', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    withCredentials([file(credentialsId: '5d2d22b9-70c7-46e9-8f4c-1e31d6bffe49', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
                     }
 
