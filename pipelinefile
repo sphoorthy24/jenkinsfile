@@ -11,6 +11,12 @@ pipeline {
         PROJECT_ID = 'advance-mantis-405222' 
     }
 
+stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: 'master']], userRemoteConfigs: [[url: 'https://github.com/sphoorthy24/jenkinsfile']]])
+            }
+        }
     stages {
         stage('Build') {
             steps {
